@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>Kubernetes介绍 - 操先森的博客</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="操先森的博客"><meta name="msapplication-TileImage" content="/images/logo.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="操先森的博客"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="K8S 是什么Kubernetes，又称为 k8s（首字母为 k、首字母与尾字母之间有 8 个字符、尾字母为 s，所以简称 k8s）或者简称为 “kube”。一个开源平台，用来干嘛的？用来自动化部署，缩扩容和管理容器应用的。下面这张图是 K8S 集群的架构图。"><meta property="og:type" content="blog"><meta property="og:title" content="Kubernetes介绍"><meta property="og:url" content="https://caolizhi.top/2021-09-Kubernetes%E4%BB%8B%E7%BB%8D/"><meta property="og:site_name" content="操先森的博客"><meta property="og:description" content="K8S 是什么Kubernetes，又称为 k8s（首字母为 k、首字母与尾字母之间有 8 个字符、尾字母为 s，所以简称 k8s）或者简称为 “kube”。一个开源平台，用来干嘛的？用来自动化部署，缩扩容和管理容器应用的。下面这张图是 K8S 集群的架构图。"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://caolizhi.top/2021-09-Kubernetes%E4%BB%8B%E7%BB%8D/k8s_architecture.png"><meta property="og:image" content="https://caolizhi.top/2021-09-Kubernetes%E4%BB%8B%E7%BB%8D/k8s_authentication_flow.png"><meta property="article:published_time" content="2021-09-27T07:45:08.000Z"><meta property="article:modified_time" content="2021-09-27T07:55:08.000Z"><meta property="article:author" content="操先森"><meta property="article:tag" content="K8S"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="/2021-09-Kubernetes%E4%BB%8B%E7%BB%8D/k8s_architecture.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://caolizhi.top/2021-09-Kubernetes%E4%BB%8B%E7%BB%8D/"},"headline":"Kubernetes介绍","image":["https://caolizhi.top/2021-09-Kubernetes%E4%BB%8B%E7%BB%8D/k8s_architecture.png","https://caolizhi.top/2021-09-Kubernetes%E4%BB%8B%E7%BB%8D/k8s_authentication_flow.png"],"datePublished":"2021-09-27T07:45:08.000Z","dateModified":"2021-09-27T07:55:08.000Z","author":{"@type":"Person","name":"操先森"},"publisher":{"@type":"Organization","name":"操先森的博客","logo":{"@type":"ImageObject","url":"https://caolizhi.top/images/logo.svg"}},"description":"K8S 是什么Kubernetes，又称为 k8s（首字母为 k、首字母与尾字母之间有 8 个字符、尾字母为 s，所以简称 k8s）或者简称为 “kube”。一个开源平台，用来干嘛的？用来自动化部署，缩扩容和管理容器应用的。下面这张图是 K8S 集群的架构图。"}</script><link rel="canonical" href="https://caolizhi.top/2021-09-Kubernetes%E4%BB%8B%E7%BB%8D/"><link rel="icon" href="/images/logo.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css"><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.4.0"></head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/images/logo.svg" alt="操先森的博客" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">归档</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/caolizhi"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="目录" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-9-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2021-09-27T07:45:08.000Z" title="2021/9/27 下午3:45:08">2021-09-27</time>发表</span><span class="level-item"><time dateTime="2021-09-27T07:55:08.000Z" title="2021/9/27 下午3:55:08">2021-09-27</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%AE%B9%E5%99%A8%E4%BA%91/">容器云</a></span><span class="level-item">14 分钟读完 (大约2098个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">Kubernetes介绍</h1><div class="content"><h3 id="K8S-是什么"><a href="#K8S-是什么" class="headerlink" title="K8S 是什么"></a>K8S 是什么</h3><p>Kubernetes，又称为 k8s（首字母为 k、首字母与尾字母之间有 8 个字符、尾字母为 s，所以简称 k8s）或者简称为 “kube”。一个开源平台，用来干嘛的？用来自动化部署，缩扩容和管理容器应用的。下面这张图是 K8S 集群的架构图。</p>
+<p><img src="/2021-09-Kubernetes%E4%BB%8B%E7%BB%8D/k8s_architecture.png" alt="K8S 的整体架构"></p>
+<span id="more"></span>
+
+<h3 id="基本概念和术语"><a href="#基本概念和术语" class="headerlink" title="基本概念和术语"></a>基本概念和术语</h3><ul>
+<li><h4 id="预期状态管理（Desired-State-Management）"><a href="#预期状态管理（Desired-State-Management）" class="headerlink" title="预期状态管理（Desired State Management）"></a>预期状态管理（Desired State Management）</h4><ul>
+<li><h5 id="K8S-API-对象（声明预期状态）"><a href="#K8S-API-对象（声明预期状态）" class="headerlink" title="K8S API 对象（声明预期状态）"></a>K8S API 对象（声明预期状态）</h5><ul>
+<li><h6 id="ConfigMap"><a href="#ConfigMap" class="headerlink" title="ConfigMap"></a>ConfigMap</h6><ul>
+<li>why<br>解耦配置文件和容器</li>
+<li>典型用法<ol>
+<li>作为环境变量，为容器所使用</li>
+<li>设置容器启动命令的启动参数（需要设置为环境变量）</li>
+<li>以 Volume 的形式挂载为容器内部的文件或者目录</li>
+</ol>
+</li>
+<li>创建<ol>
+<li>yaml 文件，<code>kubectl create -f configmap.yaml</code></li>
+<li>命令行<br>格式：<code>kubectl create configmap --from-file=[key=]source --from-file=[key=]source</code><br>（1）–from-file=文件名，就是从文件中创建<br>（2）–from-file=文件夹名，就是目录中创建<br>（3）–from-file=key=value 键值对，就是直接从 key-value 键值对创建</li>
+</ol>
+</li>
+<li>使用<ul>
+<li>通过环境变量的方式使用</li>
+<li>通过 <code>volumeMount</code> 的方式使用</li>
+</ul>
+</li>
+<li>限制<br>必须在 pod 创建之前完成</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><h5 id="K8S-Control-Plane"><a href="#K8S-Control-Plane" class="headerlink" title="K8S Control Plane"></a>K8S Control Plane</h5>确保集群当前状态匹配预期状态</li>
+</ul>
+</li>
+<li><h4 id="工作负载"><a href="#工作负载" class="headerlink" title="工作负载"></a>工作负载</h4><ul>
+<li>Pod<br>最小的调度和计算单位，由一个或者多个 container 组成，Pod 中的所有 container 共享存储，网络空间和 cgroup 的资源</li>
+<li>工作负载资源（Controllers）<ul>
+<li><p>Deployment &amp; ReplicaSet<br>Deployment 部署无状态应用，可以 rollout、update、rollback ReplicaSet。 ReplicaSet 保证特定数量的 Pod 副本始终保持运行状态，ReplicaSet 并不是直接部署，而是通过 Deployment 来部署。</p>
+</li>
+<li><p>StatefulSet<br>StatefulSet 部署有状态的应用，StatefulSet 要求一个 headless <code>Service</code> 搭配使用。</p>
+<blockquote>
+<p><strong>为什么要用 headless service + StatefulSet 部署有状态应用？</strong></p>
+<ol>
+<li>headless service会为关联的Pod分配一个域<br><font color=Blue>&lt;service name&gt;.$&lt;namespace name&gt;.svc.cluster.local</font></li>
+<li>StatefulSet会为关联的Pod保持一个不变的Pod Name<br>statefulset中Pod的hostname格式为<font color=Blue>$(StatefulSet name)-$(pod序号)</font></li>
+<li>StatefulSet会为关联的Pod分配一个dnsName<br><font color=Blue>$&lt;Pod Name&gt;.$&lt;service name&gt;.$&lt;namespace name&gt;.svc.cluster.local</font></li>
+</ol>
+</blockquote>
+</li>
+<li><p>DaemonSet<br>保证所有或者部分 Nodes 运行 Pod 的副本。使用场景在集群存储进程，日志收集进程，节点监控进程</p>
+</li>
+<li><p>Job &amp; CronJob<br>Job 和 CronJob 都是任务，前者是直到特定数量的 Job 被成功执行，后者是重复间隔执行一次。</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="核心组件的运行机制"><a href="#核心组件的运行机制" class="headerlink" title="核心组件的运行机制"></a>核心组件的运行机制</h3><ul>
+<li><h4 id="K8S-Master"><a href="#K8S-Master" class="headerlink" title="K8S Master"></a>K8S Master</h4><ul>
+<li><h5 id="kube-apiserver-API-Server"><a href="#kube-apiserver-API-Server" class="headerlink" title="kube-apiserver (API Server)"></a>kube-apiserver (API Server)</h5><ol>
+<li>对外提供各种对象的CRUD REST接口  </li>
+<li>对外提供Watch机制，通知对象变化</li>
+<li>将对象存储到 Etcd 中</li>
+</ol>
+</li>
+<li><h5 id="kube-controller-mamager-守护进程"><a href="#kube-controller-mamager-守护进程" class="headerlink" title="kube-controller-mamager (守护进程)"></a>kube-controller-mamager (守护进程)</h5>通过 apiserver 监视集群的状态，并做出相应更改，以使得集群的当前状态向预期状态靠拢，通过 Controller 会尝试将状态调整为期望的状态。Controller 包括：<code>Replication Controller</code>，<code>Node Controller</code>，<code>ResourceQuota Controller</code>，<code>Namespace Controller</code>，<code>ServiceAccount Controller</code>，<code>Token Controller</code>，<code>Service Controller</code>，<code>Endpoint Controller</code>。</li>
+<li><h5 id="kube-scheduler-调度器"><a href="#kube-scheduler-调度器" class="headerlink" title="kube-scheduler (调度器)"></a>kube-scheduler (调度器)</h5>将待调度的 Pod 按照特定的调度算法和调度策略绑定到集群中某个适合的 Node 上，并将绑定信息写入到 etcd 中，调度需要考虑的因素有：资源需求，服务治理要求，硬件/软件/策略限制，亲和以及反亲和要求，数据局域性，负载间的干扰等。</li>
+</ul>
+</li>
+<li><h4 id="Work-Node"><a href="#Work-Node" class="headerlink" title="Work Node"></a>Work Node</h4><ul>
+<li><h5 id="Kubelet（节点代理）"><a href="#Kubelet（节点代理）" class="headerlink" title="Kubelet（节点代理）"></a>Kubelet（节点代理）</h5>接受通过各种机制（主要是通过 apiserver ）提供的一组 PodSpec，确保 PodSpec 中描述的容器处于运行状态且运行状况良好</li>
+<li><h5 id="Kube-proxy（节点网络代理）"><a href="#Kube-proxy（节点网络代理）" class="headerlink" title="Kube-proxy（节点网络代理）"></a>Kube-proxy（节点网络代理）</h5>在节点上提供 Kubernetes API 中定义 Service，设置Service对应的 IPtables 规则，进行流量转发（userspace模式）</li>
+</ul>
+</li>
+</ul>
+<h3 id="共享存储原理"><a href="#共享存储原理" class="headerlink" title="共享存储原理"></a>共享存储原理</h3><ul>
+<li><h4 id="PV-PersistentVolume"><a href="#PV-PersistentVolume" class="headerlink" title="PV(PersistentVolume)"></a>PV(PersistentVolume)</h4>它是对底层网络存储的抽象，由管理员创建和配置，挂载到 node 上。PV 的生命周期：<ol>
+<li>available<br>资源的产生来源：<ul>
+<li>静态模式<br>管理员手动创建许多 PV</li>
+<li>动态模式<br>通过 StorageClass 的设置对后端存储进行描述，标记为某种类型</li>
+</ul>
+</li>
+<li>Bound</li>
+<li>Released</li>
+<li>Failed</li>
+</ol>
+</li>
+<li><h4 id="PVC-PersistentVolumeClaim"><a href="#PVC-PersistentVolumeClaim" class="headerlink" title="PVC(PersistentVolumeClaim)"></a>PVC(PersistentVolumeClaim)</h4>对 PV 的 一个申请，就像 pod 消费 node 资源一样，PVC StorageClass 生命为 “”，说明PVC禁止使用动态模式，多个 pod 可以挂载同一个 PVC</li>
+<li><h4 id="StorageClass"><a href="#StorageClass" class="headerlink" title="StorageClass"></a>StorageClass</h4>管理员定义储存资源为某种类别，用户根据 storage class 直观了解存储资源的特性</li>
+<li><h4 id="CSI-机制-（Container-Storage-Interface）容器存储接口"><a href="#CSI-机制-（Container-Storage-Interface）容器存储接口" class="headerlink" title="CSI 机制 （Container Storage Interface）容器存储接口"></a>CSI 机制 （Container Storage Interface）容器存储接口</h4><ul>
+<li>why ?<br>上面的方式都是 in-tree，耦合太重</li>
+<li>what ?<br>与容器对接的存储接口标准，存储提供方只需要基于接口标准进行存储插件的实现，就能使用K8S 的原生存储机制为容器提供存储</li>
+</ul>
+</li>
+<li><h4 id="动态存储"><a href="#动态存储" class="headerlink" title="动态存储"></a>动态存储</h4></li>
+</ul>
+<h3 id="安全机制"><a href="#安全机制" class="headerlink" title="安全机制"></a>安全机制</h3><ul>
+<li><h4 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h4><p>User类型：</p>
+<ul>
+<li><h5 id="Service-Account"><a href="#Service-Account" class="headerlink" title="Service Account"></a>Service Account</h5>K8S 管理它，并且绑定在特定的 namespace</li>
+<li><h5 id="Normal-User"><a href="#Normal-User" class="headerlink" title="Normal User"></a>Normal User</h5>存在于 K8S 集群外，使用集群的 CA 证书授权</li>
+</ul>
+</li>
+<li><h4 id="Authentication-—-客户端认证"><a href="#Authentication-—-客户端认证" class="headerlink" title="Authentication — 客户端认证"></a>Authentication — 客户端认证</h4><ul>
+<li>最严格的 HTTPS 正数认证： 基于 CA 根证书签名的双向数字证书认证方式</li>
+<li>HTTP token 认证： 通过一个 Token 来识别用户</li>
+<li>HTTP base 认证： 通过用户名 + 密码的方式认证</li>
+</ul>
+</li>
+<li><h4 id="Authorization-—-授权"><a href="#Authorization-—-授权" class="headerlink" title="Authorization — 授权"></a>Authorization — 授权</h4><ul>
+<li>RBAC<ul>
+<li>Namespace Scope<ul>
+<li>Role</li>
+<li>RoleBinding：把一个角色绑定到一个目标上 User，Group，Service Account</li>
+</ul>
+</li>
+<li>Cluster Scope<ul>
+<li>ClusterRole</li>
+<li>CluseterRoleBinding：只对集群级别角色生效</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>授权策略来决定一个 API 调用是否合法</li>
+<li>API Server 授权策略<ul>
+<li>AlawaysDeny: 拒绝所有请求，用于测试</li>
+<li>AlawaysAllow: K8S 默认设置，允许接收所有请求，集群不需要授权流程，可以采用</li>
+<li>ABAC (Attribute-Based Access Control): 基于属性的访问控制，使用用户配置的授权规则对用户请求进行匹配和控制</li>
+<li>RBAC (Role-Base Access Control): 基于角色的访问控制</li>
+<li>Node: 专用模式，对 kubelet 发出的请求进行访问控制</li>
+<li>Webhook: 调用外部 REST 服务对用户进行授权<br>鉴权的流程，可以通过命令看详细的请求，<code>kubectl --v=8 version</code>，流程如下图：<br><img src="/2021-09-Kubernetes%E4%BB%8B%E7%BB%8D/k8s_authentication_flow.png" alt="K8S 鉴权流程"></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><h4 id="Admission-Control-—-准入控制"><a href="#Admission-Control-—-准入控制" class="headerlink" title="Admission Control — 准入控制"></a>Admission Control — 准入控制</h4><p>准入控制器的插件列表中的每个准入控制器检查请求，插件举例：LimitRanger，ServiceAccount 等</p>
+</li>
+<li><h4 id="Service-Account-—-服务账户"><a href="#Service-Account-—-服务账户" class="headerlink" title="Service Account — 服务账户"></a>Service Account — 服务账户</h4><p>不是给用户用的，给运行在 Pod 中的进程提供必要的身份证明，与API Server 交互流程为：</p>
+<ol>
+<li>Pod 访问 API Server 的服务时，以 service 方式调用名为 Kubernetes 的这个服务的，而 Kubernetes 服务只在HTTPS 安全端口 443 上提供 </li>
+<li>请求时，类似于 HTTP Token，Header 中加了 token 字符串，来自于 <code>/run/secrets/kubernetes.io/serviceaccount/token</code> </li>
+<li>建立链接时，用 Pod 里指定路径下的一个 CA 证书 （<code>/run/secrets/kubernetes.io/serviceaccount/ca.rt</code>)，验证 API Server 发来的证书 </li>
+<li>API Server 在收到这个 Token，会对这个 token 进行合法性验证</li>
+<li><code>/run/secrets/kubernetes.io/serviceaccount/namespace</code> 会作为参数调用 Kubernetes API</li>
+</ol>
+<p>每个 Namespace 下都有个 default 的默认 Service Account 对象，名为 Tokens 的可以当作 Volume 被挂载到 Pod 里的 Secret，Pod 启动时挂载，协助进程访问 API Server 时的鉴权。</p>
+</li>
+<li><h4 id="Secret-—-私密凭据"><a href="#Secret-—-私密凭据" class="headerlink" title="Secret — 私密凭据"></a>Secret — 私密凭据</h4><p>保管私密凭据，从属于 Service Account，一旦 Secret 的使用方式：</p>
+<ol>
+<li>创建 Pod 时，为 Pod 指定 Service Account 自动使用改 Secret </li>
+<li>挂载该 Secret 到 Pod 使用，执行 <code>ls /etc/&#123;secret name&#125;</code> 可以看到 Secret 的 data 域中的 key 值作为目录中文件</li>
+<li>在 Docker image 下载时，指定 Pod 的  spec.ImagePullSecrets</li>
+</ol>
+</li>
+</ul>
+<h3 id="网络原理"><a href="#网络原理" class="headerlink" title="网络原理"></a>网络原理</h3><p>K8S 的网络原理比较复杂，基于 Docker 的网络之上有封装很多东西，深入了解还需要时间。</p>
+<ul>
+<li><h4 id="基础概念-1"><a href="#基础概念-1" class="headerlink" title="基础概念"></a>基础概念</h4><p>需要了解网络里面的一些概念和原理</p>
+<ul>
+<li>Linux Network Virtualization， Linux Tun/Tap</li>
+<li>Linux Network Namespace</li>
+<li>Veth Pair</li>
+<li>Linux Bridge</li>
+<li>Vlan</li>
+<li>VxlAN</li>
+<li>Routing Protocol<br>Distance Vector Protocol,BGP<br>Link-State Protocol,OSPF</li>
+</ul>
+</li>
+<li><h4 id="K8S-Network"><a href="#K8S-Network" class="headerlink" title="K8S Network"></a>K8S Network</h4><ul>
+<li>Service <ul>
+<li>Cluster IP</li>
+<li>Headless</li>
+<li>NodePort</li>
+<li>LoadBalancer<ul>
+<li>Ingress<ul>
+<li>K8S Ingress</li>
+<li>lstio Ingress Gateway</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>API Gateway + Service Mesh</li>
+<li>Kubernetes CNI 插件, Calico</li>
+</ul>
+</li>
+</ul>
+</div><div class="article-licensing box"><div class="licensing-title"><p>Kubernetes介绍</p><p><a href="https://caolizhi.top/2021-09-Kubernetes介绍/">https://caolizhi.top/2021-09-Kubernetes介绍/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>操先森</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2021-09-27</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2021-09-27</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/K8S/">K8S</a></div><!--!--></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">喜欢这篇文章？打赏一下作者吧</h3><div class="buttons is-centered"><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>微信</span><span class="qrcode"><img src="/images/wechat_pay.jpg" alt="微信"></span></a><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>支付宝</span><span class="qrcode"><img src="/images/alipay.jpg" alt="支付宝"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2021-09-%E7%BD%91%E7%BB%9CIO%E6%A8%A1%E5%9E%8B/"><span class="level-item">网络IO模型</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">评论</h3><div id="comment-container"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css"><script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script><script>var gitalk = new Gitalk({
+            id: "deed5deaf320086882b9e8c393cfb793",
+            repo: "caolizhi.github.io",
+            owner: "caolizhi",
+            clientID: "a494d62f203aa8c7e2e2",
+            clientSecret: "7114657b7a13cc18ec25989917c5d2de0de93f5c",
+            admin: ["caolizhi"],
+            createIssueManually: false,
+            distractionFreeMode: false,
+            perPage: 10,
+            pagerDirection: "last",
+            
+            
+            enableHotKey: true,
+            
+        })
+        gitalk.render('comment-container')</script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1 is-sticky"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/images/avatar.png" alt="操先森"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">操先森</p><p class="is-size-6 is-block">Java Engineer</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>四川·成都</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">10</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">7</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">10</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/caolizhi" target="_blank" rel="noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/caolizhi"><i class="fab fa-github"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">目录</h3><ul class="menu-list"><li><a class="level is-mobile" href="#K8S-是什么"><span class="level-left"><span class="level-item">1</span><span class="level-item">K8S 是什么</span></span></a></li><li><a class="level is-mobile" href="#基本概念和术语"><span class="level-left"><span class="level-item">2</span><span class="level-item">基本概念和术语</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#预期状态管理（Desired-State-Management）"><span class="level-left"><span class="level-item">2.1</span><span class="level-item">预期状态管理（Desired State Management）</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#K8S-API-对象（声明预期状态）"><span class="level-left"><span class="level-item">2.1.1</span><span class="level-item">K8S API 对象（声明预期状态）</span></span></a></li><li><a class="level is-mobile" href="#K8S-Control-Plane"><span class="level-left"><span class="level-item">2.1.2</span><span class="level-item">K8S Control Plane</span></span></a></li></ul></li><li><a class="level is-mobile" href="#工作负载"><span class="level-left"><span class="level-item">2.2</span><span class="level-item">工作负载</span></span></a></li></ul></li><li><a class="level is-mobile" href="#核心组件的运行机制"><span class="level-left"><span class="level-item">3</span><span class="level-item">核心组件的运行机制</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#K8S-Master"><span class="level-left"><span class="level-item">3.1</span><span class="level-item">K8S Master</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#kube-apiserver-API-Server"><span class="level-left"><span class="level-item">3.1.1</span><span class="level-item">kube-apiserver (API Server)</span></span></a></li><li><a class="level is-mobile" href="#kube-controller-mamager-守护进程"><span class="level-left"><span class="level-item">3.1.2</span><span class="level-item">kube-controller-mamager (守护进程)</span></span></a></li><li><a class="level is-mobile" href="#kube-scheduler-调度器"><span class="level-left"><span class="level-item">3.1.3</span><span class="level-item">kube-scheduler (调度器)</span></span></a></li></ul></li><li><a class="level is-mobile" href="#Work-Node"><span class="level-left"><span class="level-item">3.2</span><span class="level-item">Work Node</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#Kubelet（节点代理）"><span class="level-left"><span class="level-item">3.2.1</span><span class="level-item">Kubelet（节点代理）</span></span></a></li><li><a class="level is-mobile" href="#Kube-proxy（节点网络代理）"><span class="level-left"><span class="level-item">3.2.2</span><span class="level-item">Kube-proxy（节点网络代理）</span></span></a></li></ul></li></ul></li><li><a class="level is-mobile" href="#共享存储原理"><span class="level-left"><span class="level-item">4</span><span class="level-item">共享存储原理</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#PV-PersistentVolume"><span class="level-left"><span class="level-item">4.1</span><span class="level-item">PV(PersistentVolume)</span></span></a></li><li><a class="level is-mobile" href="#PVC-PersistentVolumeClaim"><span class="level-left"><span class="level-item">4.2</span><span class="level-item">PVC(PersistentVolumeClaim)</span></span></a></li><li><a class="level is-mobile" href="#StorageClass"><span class="level-left"><span class="level-item">4.3</span><span class="level-item">StorageClass</span></span></a></li><li><a class="level is-mobile" href="#CSI-机制-（Container-Storage-Interface）容器存储接口"><span class="level-left"><span class="level-item">4.4</span><span class="level-item">CSI 机制 （Container Storage Interface）容器存储接口</span></span></a></li><li><a class="level is-mobile" href="#动态存储"><span class="level-left"><span class="level-item">4.5</span><span class="level-item">动态存储</span></span></a></li></ul></li><li><a class="level is-mobile" href="#安全机制"><span class="level-left"><span class="level-item">5</span><span class="level-item">安全机制</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#基础概念"><span class="level-left"><span class="level-item">5.1</span><span class="level-item">基础概念</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#Service-Account"><span class="level-left"><span class="level-item">5.1.1</span><span class="level-item">Service Account</span></span></a></li><li><a class="level is-mobile" href="#Normal-User"><span class="level-left"><span class="level-item">5.1.2</span><span class="level-item">Normal User</span></span></a></li></ul></li><li><a class="level is-mobile" href="#Authentication-—-客户端认证"><span class="level-left"><span class="level-item">5.2</span><span class="level-item">Authentication — 客户端认证</span></span></a></li><li><a class="level is-mobile" href="#Authorization-—-授权"><span class="level-left"><span class="level-item">5.3</span><span class="level-item">Authorization — 授权</span></span></a></li><li><a class="level is-mobile" href="#Admission-Control-—-准入控制"><span class="level-left"><span class="level-item">5.4</span><span class="level-item">Admission Control — 准入控制</span></span></a></li><li><a class="level is-mobile" href="#Service-Account-—-服务账户"><span class="level-left"><span class="level-item">5.5</span><span class="level-item">Service Account — 服务账户</span></span></a></li><li><a class="level is-mobile" href="#Secret-—-私密凭据"><span class="level-left"><span class="level-item">5.6</span><span class="level-item">Secret — 私密凭据</span></span></a></li></ul></li><li><a class="level is-mobile" href="#网络原理"><span class="level-left"><span class="level-item">6</span><span class="level-item">网络原理</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#基础概念-1"><span class="level-left"><span class="level-item">6.1</span><span class="level-item">基础概念</span></span></a></li><li><a class="level is-mobile" href="#K8S-Network"><span class="level-left"><span class="level-item">6.2</span><span class="level-item">K8S Network</span></span></a></li></ul></li></ul></div></div><script src="/js/toc.js" defer></script></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Java/"><span class="level-start"><span class="level-item">Java</span></span><span class="level-end"><span class="level-item tag">4</span></span></a><ul><li><a class="level is-mobile" href="/categories/Java/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"><span class="level-start"><span class="level-item">内存模型</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/Java/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"><span class="level-start"><span class="level-item">多线程</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li></ul></li><li><a class="level is-mobile" href="/categories/%E5%93%8D%E5%BA%94%E5%BC%8F%E7%BC%96%E7%A8%8B/"><span class="level-start"><span class="level-item">响应式编程</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%AE%B9%E5%99%A8%E4%BA%91/"><span class="level-start"><span class="level-item">容器云</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"><span class="level-start"><span class="level-item">数据库</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"><span class="level-start"><span class="level-item">网络编程</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-09-27T07:45:08.000Z">2021-09-27</time></p><p class="title"><a href="/2021-09-Kubernetes%E4%BB%8B%E7%BB%8D/">Kubernetes介绍</a></p><p class="categories"><a href="/categories/%E5%AE%B9%E5%99%A8%E4%BA%91/">容器云</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-09-22T01:32:31.000Z">2021-09-22</time></p><p class="title"><a href="/2021-09-%E7%BD%91%E7%BB%9CIO%E6%A8%A1%E5%9E%8B/">网络IO模型</a></p><p class="categories"><a href="/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">网络编程</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-09-17T02:19:11.000Z">2021-09-17</time></p><p class="title"><a href="/2021-09-Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E4%B9%8Bwhat-why-how/">Java内存模型之what,why,how</a></p><p class="categories"><a href="/categories/Java/">Java</a> / <a href="/categories/Java/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">内存模型</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-09-16T09:05:59.000Z">2021-09-16</time></p><p class="title"><a href="/2021-09-%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">线程池源码分析</a></p><p class="categories"><a href="/categories/Java/">Java</a> / <a href="/categories/Java/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">多线程</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-09-16T09:02:03.000Z">2021-09-16</time></p><p class="title"><a href="/2021-09-Java-JUC-%E4%B8%AD%E7%9A%84%E5%9F%BA%E7%9F%B3%EF%BC%9A-AQS-%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/">Java JUC 中的基石： AQS 源码解读</a></p><p class="categories"><a href="/categories/Java/">Java</a> / <a href="/categories/Java/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">多线程</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2021/09/"><span class="level-start"><span class="level-item">九月 2021</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/08/"><span class="level-start"><span class="level-item">八月 2021</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/AQS/"><span class="tag">AQS</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/CAS/"><span class="tag">CAS</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/I-O/"><span class="tag">I/O</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/JUC/"><span class="tag">JUC</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Java/"><span class="tag">Java</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/K8S/"><span class="tag">K8S</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/mysql/"><span class="tag">mysql</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/reactive/"><span class="tag">reactive</span><span class="tag">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/web/"><span class="tag">web</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/"><span class="tag">线程池</span><span class="tag">1</span></a></div></div></div></div></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/images/logo.svg" alt="操先森的博客" height="28"></a><p class="is-size-7"><span>&copy; 2021 操先森</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/caolizhi"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>
