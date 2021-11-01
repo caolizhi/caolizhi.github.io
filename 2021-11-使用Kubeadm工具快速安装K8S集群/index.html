@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>使用Kubeadm工具快速安装K8S集群 - 操先森的博客</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="操先森的博客"><meta name="msapplication-TileImage" content="/images/logo.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="操先森的博客"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="1. 预备工作 准备两台 CentOS 7.8 的虚拟机  安装 docker engineer    清理docker，没有安装过 docker ，没有必要执行 &amp;#96;sudo yum remove docker \               docker-client \               docker-client-latest \               docker-comm"><meta property="og:type" content="blog"><meta property="og:title" content="使用Kubeadm工具快速安装K8S集群"><meta property="og:url" content="https://caolizhi.top/2021-11-%E4%BD%BF%E7%94%A8Kubeadm%E5%B7%A5%E5%85%B7%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85K8S%E9%9B%86%E7%BE%A4/"><meta property="og:site_name" content="操先森的博客"><meta property="og:description" content="1. 预备工作 准备两台 CentOS 7.8 的虚拟机  安装 docker engineer    清理docker，没有安装过 docker ，没有必要执行 &amp;#96;sudo yum remove docker \               docker-client \               docker-client-latest \               docker-comm"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://caolizhi.top/img/og_image.png"><meta property="article:published_time" content="2021-11-01T08:54:17.000Z"><meta property="article:modified_time" content="2021-11-01T08:54:17.000Z"><meta property="article:author" content="操先森"><meta property="article:tag" content="K8S"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://caolizhi.top/2021-11-%E4%BD%BF%E7%94%A8Kubeadm%E5%B7%A5%E5%85%B7%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85K8S%E9%9B%86%E7%BE%A4/"},"headline":"使用Kubeadm工具快速安装K8S集群","image":["https://caolizhi.top/img/og_image.png"],"datePublished":"2021-11-01T08:54:17.000Z","dateModified":"2021-11-01T08:54:17.000Z","author":{"@type":"Person","name":"操先森"},"publisher":{"@type":"Organization","name":"操先森的博客","logo":{"@type":"ImageObject","url":"https://caolizhi.top/images/logo.svg"}},"description":"1. 预备工作 准备两台 CentOS 7.8 的虚拟机  安装 docker engineer    清理docker，没有安装过 docker ，没有必要执行 &#96;sudo yum remove docker \\               docker-client \\               docker-client-latest \\               docker-comm"}</script><link rel="canonical" href="https://caolizhi.top/2021-11-%E4%BD%BF%E7%94%A8Kubeadm%E5%B7%A5%E5%85%B7%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85K8S%E9%9B%86%E7%BE%A4/"><link rel="icon" href="/images/logo.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><script>var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "//hm.baidu.com/hm.js?c2c31a128dbe61bc1214fcf1f334afd1";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();</script><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css"><script src="https://www.googletagmanager.com/gtag/js?id=UA-210020245-1" async></script><script>window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+    
+        gtag('config', 'UA-210020245-1');</script><!--!--><script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.4.0"></head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/images/logo.svg" alt="操先森的博客" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">归档</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/caolizhi"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="目录" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-9-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2021-11-01T08:54:17.000Z" title="2021/11/1 下午4:54:17">2021-11-01</time>发表</span><span class="level-item"><time dateTime="2021-11-01T08:54:17.000Z" title="2021/11/1 下午4:54:17">2021-11-01</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/">云原生</a></span><span class="level-item">21 分钟读完 (大约3202个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">使用Kubeadm工具快速安装K8S集群</h1><div class="content"><h2 id="1-预备工作"><a href="#1-预备工作" class="headerlink" title="1. 预备工作"></a>1. 预备工作</h2><ul>
+<li><p>准备两台 CentOS 7.8 的虚拟机</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://docs.docker.com/engine/install/centos/">安装 docker engineer </a></p>
+<blockquote>
+<ol>
+<li><p>清理docker，没有安装过 docker ，没有必要执行</p>
+<p>`sudo yum remove docker \</p>
+<pre><code>              docker-client \
+              docker-client-latest \
+              docker-common \
+              docker-latest \
+              docker-latest-logrotate \
+              docker-logrotate \
+              docker-engine`
+</code></pre>
+</li>
+<li><p>安装 yum-utils，提供了组件 yum-config-manager</p>
+<p><code>sudo yum install -y yum-utils</code></p>
+</li>
+<li><p>添加 yum 源<br><code>sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo</code></p>
+</li>
+<li><p>安装 docker engine<br><code>sudo yum install docker-ce docker-ce-cli containerd.io</code></p>
+</li>
+<li><p>开启 docker 服务<br><code>sudo systemctl start docker</code></p>
+</li>
+<li><p>automaticly startup<br><code>sudo systemctl enable docker</code></p>
+</li>
+</ol>
+</blockquote>
+</li>
+</ul>
+<span id="more"></span>
+
+<ul>
+<li>关闭防火墙</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl disable firewalld </span><br><span class="line">systemctl stop firewalld</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>可以配置防火墙的端口号，不用关闭防火墙，各个组件的端口号</p>
+<table>
+<thead>
+<tr>
+<th>组件名称</th>
+<th>默认端口</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>API Server</td>
+<td>8080（HTTP 非安全端口号）<br />6443 （HTTPS 安全端口号）</td>
+</tr>
+<tr>
+<td>Controller Manager</td>
+<td>10252</td>
+</tr>
+<tr>
+<td>Scheduler</td>
+<td>10251</td>
+</tr>
+<tr>
+<td>kubelet</td>
+<td>10250<br />10255（只读端口号）</td>
+</tr>
+<tr>
+<td>etcd</td>
+<td>2379（供客户端访问）<br />2380 （供 etcd 集群内部节点之间访问）</td>
+</tr>
+<tr>
+<td>集群 DNS 服务</td>
+<td>53（UPD）<br />53（TCP）</td>
+</tr>
+</tbody></table>
+</blockquote>
+<ul>
+<li>建议在主机上禁用 SELinux<br>修改 <code>/etc/sysconfig/selinux</code>，将 <code>SELINUX=enforcing</code> 修改为 <code>disabled</code>，让容器可以读取主机文件系统</li>
+</ul>
+<h2 id="2-安装-kubeadm"><a href="#2-安装-kubeadm" class="headerlink" title="2. 安装 kubeadm"></a>2. 安装 kubeadm</h2><ul>
+<li>配置 k8s 的 官方yum 源，修改 <code>/etc/yum.repos.d/kubernetes.repo</code>, 内容如下：</li>
+</ul>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[kubernetes]</span> </span><br><span class="line"><span class="attr">name</span>=Kubernetes Repository </span><br><span class="line"><span class="attr">name</span>=Kubernetes </span><br><span class="line"><span class="attr">baseurl</span>=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\<span class="variable">$basearch</span></span><br><span class="line"><span class="attr">enabled</span>=<span class="number">1</span></span><br><span class="line"><span class="attr">gpgcheck</span>=<span class="number">1</span></span><br><span class="line"><span class="attr">repo_gpgcheck</span>=<span class="number">1</span></span><br><span class="line"><span class="attr">gpgkey</span>=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg exclude=kubelet kubeadm kubectl </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>运行 yum install 命令安装 kubeadm，kubelet 和 kubectl:</p>
+<p><code>yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes</code></p>
+</li>
+<li><p>启动 kubeadm</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl start kubelet</span><br><span class="line">systemctl enable kubelet</span><br></pre></td></tr></table></figure></li>
+<li><p>kubeadm 需要关闭 linux 的 swap 系统交换区</p>
+<p><code>swapoff -a</code></p>
+</li>
+</ul>
+<h2 id="3-修改-kubeadm-的默认配置"><a href="#3-修改-kubeadm-的默认配置" class="headerlink" title="3. 修改 kubeadm 的默认配置"></a>3. 修改 kubeadm 的默认配置</h2><p>查看初始化的配置，也称为控制平面（Control Plane）配置和加入节点的配置，</p>
+<p><code>kubeadm config print init-defaults</code>  查看 kubeadm init 命令默认参数的内容</p>
+<details><summary>init default 配置</summary>
+<pre><code>
+apiVersion: kubeadm.k8s.io/v1beta3
+bootstrapTokens:
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: abcdef.0123456789abcdef
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: 1.2.3.4
+  bindPort: 6443
+nodeRegistration:
+  criSocket: /var/run/dockershim.sock
+  imagePullPolicy: IfNotPresent
+  name: node
+  taints: null
+---
+apiServer:
+  timeoutForControlPlane: 4m0s
+apiVersion: kubeadm.k8s.io/v1beta3
+certificatesDir: /etc/kubernetes/pki
+clusterName: kubernetes
+controllerManager: &#123;&#125;
+dns: &#123;&#125;
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+imageRepository: k8s.gcr.io
+kind: ClusterConfiguration
+kubernetesVersion: 1.22.0
+networking:
+  dnsDomain: cluster.local
+  serviceSubnet: 10.96.0.0/12
+scheduler: &#123;&#125;
+</code></pre>
+</details>
+
+<p><code>kubeadm config print join-defaults</code> 查看 kubeadm join 命令默认参数的内容</p>
+<details><summary> join defaults 配置 </summary>
+    <pre>
+    <code>
+apiVersion: kubeadm.k8s.io/v1beta3
+caCertPath: /etc/kubernetes/pki/ca.crt
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: kube-apiserver:6443
+    token: abcdef.0123456789abcdef
+    unsafeSkipCAVerification: true
+  timeout: 5m0s
+  tlsBootstrapToken: abcdef.0123456789abcdef
+kind: JoinConfiguration
+nodeRegistration:
+  criSocket: /var/run/dockershim.sock
+  imagePullPolicy: IfNotPresent
+  name: node01
+  taints: null
+  </code>
+  </pre>
+</details>
+
+<p>目前暂用默认配置</p>
+<h2 id="4-下载-Kubernetes-的相关镜像"><a href="#4-下载-Kubernetes-的相关镜像" class="headerlink" title="4. 下载 Kubernetes 的相关镜像"></a>4. 下载 Kubernetes 的相关镜像</h2><p>需要预先下载所需要的镜像，通过命令 <code>kubeadm config images list </code> 查看</p>
+<p><code>kubeadm config images list</code></p>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">k8s.gcr.io/kube-apiserver:v1.22.3</span><br><span class="line">k8s.gcr.io/kube-controller-manager:v1.22.3</span><br><span class="line">k8s.gcr.io/kube-scheduler:v1.22.3</span><br><span class="line">k8s.gcr.io/kube-proxy:v1.22.3</span><br><span class="line">k8s.gcr.io/pause:3.5</span><br><span class="line">k8s.gcr.io/etcd:3.5.0-0</span><br><span class="line">k8s.gcr.io/coredns/coredns:v1.8.4</span><br></pre></td></tr></table></figure>
+
+<p>执行命令：<code>kubeadm config images pull</code>，如果配置了 config 文件就加上参数，<code>--config=/path/config.yaml</code></p>
+<h2 id="5-运行-kubeadm-init-命令安装-Master-节点"><a href="#5-运行-kubeadm-init-命令安装-Master-节点" class="headerlink" title="5. 运行 kubeadm init 命令安装 Master 节点"></a>5. 运行 kubeadm init 命令安装 Master 节点</h2><p>首先执行预检查命令，<code>kubeadm init phase reflight</code> 确保主机环境符合安装要求，然后再通过命令 <code>kubeadm init</code> 命令安装 K8S 的 Master 节点。</p>
+<blockquote>
+<p> 要说明的一点，K8S 默认设置 cgroup 驱动（cgroupdriver）为 <code>systemd</code>， 而 docker 服务的 cgroup 驱动默认值为 <code>cgroupfs</code>，建议修改为 <code>systemd</code>。修改 Docker 服务的配置文件（默认的位置：<code>/etc/docker/daemon.json</code>），如果没有的话，就新建一个 <code>daemon.json</code>，添加一下配置：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;exec-opts&quot;</span>:[<span class="string">&quot;native.cgroupdriver=systemd&quot;</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>执行预检查命令显示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[preflight] Running pre-flight checks</span><br><span class="line">  [WARNING Hostname]: hostname &quot;node01&quot; could not be reached</span><br><span class="line">  [WARNING Hostname]: hostname &quot;node01&quot;: lookup node01 on 114.114.114.114:53: no such host error execution phase preflight: [preflight] Some fatal errors occurred:</span><br><span class="line">  [ERROR NumCPU]: the number of available CPUs 1 is less than the required 2</span><br><span class="line">  [ERROR Mem]: the system RAM (972 MB) is less than the minimum 1700 MB</span><br><span class="line">  [ERROR FileContent--proc-sys-net-bridge-bridge-nf-call-iptables]: /proc/sys/net/bridge/bridge-nf-call-iptables contents are not set to 1</span><br></pre></td></tr></table></figure>
+
+<p>上面 error 错误中，前两个 error 原因主要是虚拟机的资源不够，加大到 2 核心 和 2G 内存，最后一个 error 意思是使用了 IPV6 的地址，并且 <code>/proc/sys/net/bridge/bridge-nf-call-iptables</code> 值不为1，通过 <code>echo 1 &gt; /proc/sys/net/bridge/bridge-nf-call-iptables</code> 即可。</p>
+<p>再次执行预检查命令，只有 warn ，没有 error 了，执行初始化命令。启动失败：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">[control-plane] Creating static Pod manifest for &quot;kube-scheduler&quot;</span><br><span class="line">[etcd] Creating static Pod manifest for local etcd in &quot;/etc/kubernetes/manifests&quot;</span><br><span class="line">[wait-control-plane] Waiting for the kubelet to boot up the control plane as static Pods from directory &quot;/etc/kubernetes/manifests&quot;. This can take up to 4m0s</span><br><span class="line">[kubelet-check] Initial timeout of 40s passed.</span><br><span class="line">[kubelet-check] It seems like the kubelet isn&#x27;t running or healthy.</span><br><span class="line">[kubelet-check] The HTTP call equal to &#x27;curl -sSL http://localhost:10248/healthz&#x27; failed with error: Get &quot;http://localhost:10248/healthz&quot;: dial tcp [::1]:10248: connect: connection refused.</span><br><span class="line">[kubelet-check] It seems like the kubelet isn&#x27;t running or healthy.</span><br><span class="line">[kubelet-check] The HTTP call equal to &#x27;curl -sSL http://localhost:10248/healthz&#x27; failed with error: Get &quot;http://localhost:10248/healthz&quot;: dial tcp [::1]:10248: connect: connection refused.</span><br><span class="line">[kubelet-check] It seems like the kubelet isn&#x27;t running or healthy.</span><br><span class="line">[kubelet-check] The HTTP call equal to &#x27;curl -sSL http://localhost:10248/healthz&#x27; failed with error: Get &quot;http://localhost:10248/healthz&quot;: dial tcp [::1]:10248: connect: connection refused.</span><br><span class="line">[kubelet-check] It seems like the kubelet isn&#x27;t running or healthy.</span><br><span class="line">[kubelet-check] The HTTP call equal to &#x27;curl -sSL http://localhost:10248/healthz&#x27; failed with error: Get &quot;http://localhost:10248/healthz&quot;: dial tcp [::1]:10248: connect: connection refused.</span><br><span class="line">[kubelet-check] It seems like the kubelet isn&#x27;t running or healthy.</span><br><span class="line">[kubelet-check] The HTTP call equal to &#x27;curl -sSL http://localhost:10248/healthz&#x27; failed with error: Get &quot;http://localhost:10248/healthz&quot;: dial tcp [::1]:10248: connect: connection refused.</span><br><span class="line"></span><br><span class="line">        Unfortunately, an error has occurred:</span><br><span class="line">                timed out waiting for the condition</span><br><span class="line"></span><br><span class="line">        This error is likely caused by:</span><br><span class="line">                - The kubelet is not running</span><br><span class="line">                - The kubelet is unhealthy due to a misconfiguration of the node in some way (required cgroups disabled)</span><br><span class="line"></span><br><span class="line">        If you are on a systemd-powered system, you can try to troubleshoot the error with the following commands:</span><br><span class="line">                - &#x27;systemctl status kubelet&#x27;</span><br><span class="line">                - &#x27;journalctl -xeu kubelet&#x27;</span><br><span class="line"></span><br><span class="line">        Additionally, a control plane component may have crashed or exited when started by the container runtime.</span><br><span class="line">        To troubleshoot, list all containers using your preferred container runtimes CLI.</span><br><span class="line"></span><br><span class="line">        Here is one example how you may list all Kubernetes containers running in docker:</span><br><span class="line">                - &#x27;docker ps -a | grep kube | grep -v pause&#x27;</span><br><span class="line">                Once you have found the failing container, you can inspect its logs with:</span><br><span class="line">                - &#x27;docker logs CONTAINERID&#x27;</span><br><span class="line"></span><br><span class="line">error execution phase wait-control-plane: couldn&#x27;t initialize a Kubernetes cluster</span><br><span class="line">To see the stack trace of this error execute with --v=5 or higher</span><br></pre></td></tr></table></figure>
+
+<p>kubelet 没有启动起来，查看日志：<code>tail /var/log/messages</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Nov  1 15:04:51 node01 kubelet: I1101 15:04:51.235877    8809 docker_service.go:242] &quot;Hairpin mode is set&quot; hairpinMode=hairpin-veth</span><br><span class="line">Nov  1 15:04:51 node01 kubelet: I1101 15:04:51.235947    8809 cni.go:239] &quot;Unable to update cni config&quot; err=&quot;no networks found in /etc/cni/net.d&quot;</span><br><span class="line">Nov  1 15:04:51 node01 kubelet: I1101 15:04:51.242254    8809 cni.go:239] &quot;Unable to update cni config&quot; err=&quot;no networks found in /etc/cni/net.d&quot;</span><br><span class="line">Nov  1 15:04:51 node01 kubelet: I1101 15:04:51.242306    8809 docker_service.go:257] &quot;Docker cri networking managed by the network plugin&quot; networkPluginName=&quot;cni&quot;</span><br><span class="line">Nov  1 15:04:51 node01 kubelet: I1101 15:04:51.242331    8809 cni.go:239] &quot;Unable to update cni config&quot; err=&quot;no networks found in /etc/cni/net.d&quot;</span><br><span class="line">Nov  1 15:04:51 node01 kubelet: I1101 15:04:51.249360    8809 docker_service.go:264] &quot;Docker Info&quot; dockerInfo=&amp;&#123;ID:ZB4Z:FUQW:IXZR:H3XP:E4PL:WXGO:4ODH:A72V:BDIY:D4AJ:F6S7:M2J2 Containers:0 ContainersRunning:0 ContainersPaused:0 ContainersStopped:0 Images:7 Driver:overlay2 DriverStatus:[[Backing Filesystem extfs] [Supports d_type true] [Native Overlay Diff true] [userxattr false]] SystemStatus:[] Plugins:&#123;Volume:[local] Network:[bridge host ipvlan macvlan null overlay] Authorization:[] Log:[awslogs fluentd gcplogs gelf journald json-file local logentries splunk syslog]&#125; MemoryLimit:true SwapLimit:true KernelMemory:true KernelMemoryTCP:true CPUCfsPeriod:true CPUCfsQuota:true CPUShares:true CPUSet:true PidsLimit:true IPv4Forwarding:true BridgeNfIptables:true BridgeNfIP6tables:false Debug:false NFd:25 OomKillDisable:true NGoroutines:34 SystemTime:2021-11-01T15:04:51.242765302+08:00 LoggingDriver:json-file CgroupDriver:cgroupfs CgroupVersion:1 NEventsListener:0 KernelVersion:3.10.0-1160.45.1.el7.x86_64 OperatingSystem:CentOS Linux 7 (Core) OSVersion:7 OSType:linux Architecture:x86_64 IndexServerAddress:https://index.docker.io/v1/ RegistryConfig:0xc0003fa070 NCPU:2 MemTotal:2093301760 GenericResources:[] DockerRootDir:/var/lib/docker HTTPProxy: HTTPSProxy: NoProxy: Name:node01 Labels:[] ExperimentalBuild:false ServerVersion:20.10.10 ClusterStore: ClusterAdvertise: Runtimes:map[io.containerd.runc.v2:&#123;Path:runc Args:[] Shim:&lt;nil&gt;&#125; io.containerd.runtime.v1.linux:&#123;Path:runc Args:[] Shim:&lt;nil&gt;&#125; runc:&#123;Path:runc Args:[] Shim:&lt;nil&gt;&#125;] DefaultRuntime:runc Swarm:&#123;NodeID: NodeAddr: LocalNodeState:inactive ControlAvailable:false Error: RemoteManagers:[] Nodes:0 Managers:0 Cluster:&lt;nil&gt; Warnings:[]&#125; LiveRestoreEnabled:false Isolation: InitBinary:docker-init ContainerdCommit:&#123;ID:5b46e404f6b9f661a205e28d59c982d3634148f8 Expected:5b46e404f6b9f661a205e28d59c982d3634148f8&#125; RuncCommit:&#123;ID:v1.0.2-0-g52b36a2 Expected:v1.0.2-0-g52b36a2&#125; InitCommit:&#123;ID:de40ad0 Expected:de40ad0&#125; SecurityOptions:[name=seccomp,profile=default] ProductLicense: DefaultAddressPools:[] Warnings:[WARNING: bridge-nf-call-ip6tables is disabled]&#125;</span><br><span class="line">Nov  1 15:04:51 node01 kubelet: E1101 15:04:51.249384    8809 server.go:294] &quot;Failed to run kubelet&quot; err=&quot;failed to run Kubelet: misconfiguration: kubelet cgroup driver: \&quot;systemd\&quot; is different from docker cgroup driver: \&quot;cgroupfs\&quot;&quot;</span><br><span class="line">Nov  1 15:04:51 node01 systemd: kubelet.service: main process exited, code=exited, status=1/FAILURE</span><br><span class="line">Nov  1 15:04:51 node01 systemd: Unit kubelet.service entered failed state.</span><br><span class="line">Nov  1 15:04:51 node01 systemd: kubelet.service failed.</span><br></pre></td></tr></table></figure>
+
+<p>发现是 K8S 和 docker 的 cgroup driver 不同。刚才配置了 docker 的 cgroup 的 daemon.json文件没有重启 docker，重启 docker 服务，让配置文件生效。 执行：</p>
+<p><code>systemctl daemon-reload &amp;&amp; systemctl restart docker</code></p>
+<p>执行 <code>kubeadm reset</code> 命令回滚通过 <code>kubeadm init</code> 操作产生的文件，然后重新执行 <code>kubeadm init</code></p>
+<p>出现如下的日志，表示 Master 节点 Control Panel 安装成功了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">[mark-control-plane] Marking the node node01 as control-plane by adding the taints [node-role.kubernetes.io/master:NoSchedule]</span><br><span class="line">[bootstrap-token] Using token: 810man.kfqm2lvq8mfqq2k7</span><br><span class="line">[bootstrap-token] Configuring bootstrap tokens, cluster-info ConfigMap, RBAC Roles</span><br><span class="line">[bootstrap-token] configured RBAC rules to allow Node Bootstrap tokens to get nodes</span><br><span class="line">[bootstrap-token] configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order for nodes to get long term certificate credentials</span><br><span class="line">[bootstrap-token] configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token</span><br><span class="line">[bootstrap-token] configured RBAC rules to allow certificate rotation for all node client certificates in the cluster</span><br><span class="line">[bootstrap-token] Creating the &quot;cluster-info&quot; ConfigMap in the &quot;kube-public&quot; namespace</span><br><span class="line">[kubelet-finalize] Updating &quot;/etc/kubernetes/kubelet.conf&quot; to point to a rotatable kubelet client certificate and key</span><br><span class="line">[addons] Applied essential addon: CoreDNS</span><br><span class="line">[addons] Applied essential addon: kube-proxy</span><br><span class="line"></span><br><span class="line">Your Kubernetes control-plane has initialized successfully!</span><br><span class="line"></span><br><span class="line">To start using your cluster, you need to run the following as a regular user:</span><br><span class="line"></span><br><span class="line">  mkdir -p $HOME/.kube</span><br><span class="line">  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line">  sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br><span class="line"></span><br><span class="line">Alternatively, if you are the root user, you can run:</span><br><span class="line"></span><br><span class="line">  export KUBECONFIG=/etc/kubernetes/admin.conf</span><br><span class="line"></span><br><span class="line">You should now deploy a pod network to the cluster.</span><br><span class="line">Run &quot;kubectl apply -f [podnetwork].yaml&quot; with one of the options listed at:</span><br><span class="line">  https://kubernetes.io/docs/concepts/cluster-administration/addons/</span><br><span class="line"></span><br><span class="line">Then you can join any number of worker nodes by running the following on each as root:</span><br><span class="line"></span><br><span class="line">kubeadm join 192.168.170.111:6443 --token 810man.kfqm2lvq8mfqq2k7 \</span><br><span class="line">        --discovery-token-ca-cert-hash sha256:e89417229adccca09076f811a36cb50c0e19702c3d2bd0b1a4808c7f68ea1785</span><br></pre></td></tr></table></figure>
+
+<p>根据提示需要配置 CA 证书，如果是 root 用户，直接执行 <code>export KUBECONFIG=/etc/kubernetes/admin.conf</code>，然后就可以使用 <code>kubectl</code> 操作集群了。</p>
+<p>目前 Master 节点已经可以工作了，但是没有 Worker 节点，并且现在的集群是没有网络的，需要配置网络。</p>
+<h2 id="6-加入新的-node-节点"><a href="#6-加入新的-node-节点" class="headerlink" title="6. 加入新的 node 节点"></a>6. 加入新的 node 节点</h2><ul>
+<li><p>安装 kubeadm 和 kubelet</p>
+<p><strong>在 worker 节点上无需安装 kubectl</strong></p>
+<p><code>yum install kubelet kubeadm --disableexcludes=kubernetes</code></p>
+<p>启动 kubelet 的服务器，并设置为开机启动</p>
+<p><code>systemctl start kubelet &amp;&amp; systemctl enable kubelet</code></p>
+</li>
+<li><p>kubeadm 需要关闭 linux 的 swap 系统交换区</p>
+<p><code>swapoff -a</code></p>
+</li>
+<li><p>修改新 node 节点的 docker cgroup 的配置， <code>/etc/docker/daemon.json</code></p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;exec-opts&quot;:[&quot;native.cgroupdriver=systemd&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>使用 <code>kubeadm join</code> 命令加入集群，可以从上面的安装完 Master 的提示中复制 join 的命令：</p>
+<p><code>kubeadm join 192.168.170.111:6443 --token 810man.kfqm2lvq8mfqq2k7 \ --discovery-token-ca-cert-hash sha256:e89417229adccca09076f811a36cb50c0e19702c3d2bd0b1a4808c7f68ea1785</code></p>
+<p>最后出现日志，<strong>This node has joined the cluster xxxxx</strong></p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[preflight] Running pre-flight checks</span><br><span class="line">        [WARNING Hostname]: hostname &quot;node02&quot; could not be reached</span><br><span class="line">        [WARNING Hostname]: hostname &quot;node02&quot;: lookup node02 on 114.114.114.114:53: no such host</span><br><span class="line">[preflight] Reading configuration from the cluster...</span><br><span class="line">[preflight] FYI: You can look at this config file with &#x27;kubectl -n kube-system get cm kubeadm-config -o yaml&#x27;</span><br><span class="line">[kubelet-start] Writing kubelet configuration to file &quot;/var/lib/kubelet/config.yaml&quot;</span><br><span class="line">[kubelet-start] Writing kubelet environment file with flags to file &quot;/var/lib/kubelet/kubeadm-flags.env&quot;</span><br><span class="line">[kubelet-start] Starting the kubelet</span><br><span class="line">[kubelet-start] Waiting for the kubelet to perform the TLS Bootstrap...</span><br><span class="line"></span><br><span class="line">This node has joined the cluster:</span><br><span class="line">* Certificate signing request was sent to apiserver and a response was received.</span><br><span class="line">* The Kubelet was informed of the new secure connection details.</span><br><span class="line"></span><br><span class="line">Run &#x27;kubectl get nodes&#x27; on the control-plane to see this node join the cluster.</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果执行 <code>kubeadm join</code> 失败，可以执行 <code>kubeadm reset</code> 命令恢复原状，然后再重新执行 join 命令。同理 <code>kubeadm init</code> 命令也是一样。</p>
+</blockquote>
+<p>根据提示，在 Master 节点上执行命令 <code>kubectl get nodes</code>，获取到当前集群中的 node，</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@node01 docker]# kubectl get nodes</span><br><span class="line">NAME     STATUS     ROLES                  AGE     VERSION</span><br><span class="line">node01   NotReady   control-plane,master   67m     v1.22.3</span><br><span class="line">node02   NotReady   &lt;none&gt;                 5m38s   v1.22.3</span><br></pre></td></tr></table></figure>
+
+<p>这时候是没有网络的，所以节点都是 NOT READY 的状态，在查看 <code>/var/log/messages</code> 的日志时，一直报网络的错误：</p>
+ <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Nov  1 16:18:50 node01 kubelet: I1101 16:18:50.622393   13344 cni.go:239] &quot;Unable to update cni config&quot; err=&quot;no networks found in /etc/cni/net.d&quot;</span><br><span class="line">Nov  1 16:18:52 node01 kubelet: E1101 16:18:52.110886   13344 kubelet.go:2337] &quot;Container runtime network not ready&quot; networkReady=&quot;NetworkReady=false reason:NetworkPluginNotReady message:docker: network plugin is not ready: cni config uninitialized&quot;</span><br></pre></td></tr></table></figure>
+
+<p>所以接下来，我们需要配置网络 CNI 插件。</p>
+<blockquote>
+<p>可以通过设置，让 Master 节点也作为 Node 角色。删除 Node 的 label <code>node-role.kubernetes.io/master</code>即可。通过命令：</p>
+<p><code>kubectl taint nodes --all node-role.kubernetes.io/master</code></p>
+</blockquote>
+</li>
+</ul>
+<h2 id="7-安装-CNI-网络插件"><a href="#7-安装-CNI-网络插件" class="headerlink" title="7. 安装 CNI 网络插件"></a>7. 安装 CNI 网络插件</h2><p>对于 CNI 网络插件的安装，选择 Calico CNI 插件，在 Master 节点，运行命令一键安装：</p>
+<p><code>kubectl apply -f &#39;https://docs.projectcalico.org/manifests/calico.yaml&#39;</code></p>
+<p>安装完之后，再次执行 <code>kubectl get nodes</code> ，node 已经 READY 状态。</p>
+<h2 id="8-验证-Kurnetes-集群是否正常工作"><a href="#8-验证-Kurnetes-集群是否正常工作" class="headerlink" title="8. 验证 Kurnetes 集群是否正常工作"></a>8. 验证 Kurnetes 集群是否正常工作</h2><p>运行查看 POD 命令，验证 K8S 集群服务的 POD 是否创建成功且正常运行</p>
+<p><code>kubectl get pods --all-namespaces</code>，输出如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@node01 docker]# kubectl get pods --all-namespaces</span><br><span class="line">NAMESPACE     NAME                                       READY   STATUS    RESTARTS   AGE</span><br><span class="line">kube-system   calico-kube-controllers-75f8f6cc59-cfwt7   1/1     Running   0          6m19s</span><br><span class="line">kube-system   calico-node-2gb5b                          1/1     Running   0          6m19s</span><br><span class="line">kube-system   calico-node-5786l                          1/1     Running   0          6m19s</span><br><span class="line">kube-system   coredns-78fcd69978-774r8                   1/1     Running   0          93m</span><br><span class="line">kube-system   coredns-78fcd69978-dgpq4                   1/1     Running   0          93m</span><br><span class="line">kube-system   etcd-node01                                1/1     Running   1          93m</span><br><span class="line">kube-system   kube-apiserver-node01                      1/1     Running   1          93m</span><br><span class="line">kube-system   kube-controller-manager-node01             1/1     Running   1          93m</span><br><span class="line">kube-system   kube-proxy-59xsr                           1/1     Running   0          31m</span><br><span class="line">kube-system   kube-proxy-kdrt9                           1/1     Running   0          93m</span><br><span class="line">kube-system   kube-scheduler-node01                      1/1     Running   1          93m</span><br></pre></td></tr></table></figure>
+
+
+
+<p>至此， 一个正常的 K8S 集群就已经安装成功了。但是这个集群是不可靠的集群，一旦 Master 节点 down 调，那么整个集群就会崩溃，所以生产环境中还是要搭建高可用的集群。</p>
+</div><div class="article-licensing box"><div class="licensing-title"><p>使用Kubeadm工具快速安装K8S集群</p><p><a href="https://caolizhi.top/2021-11-使用Kubeadm工具快速安装K8S集群/">https://caolizhi.top/2021-11-使用Kubeadm工具快速安装K8S集群/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>操先森</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2021-11-01</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2021-11-01</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/K8S/">K8S</a></div><div class="sharethis-inline-share-buttons"></div><script src="https://platform-api.sharethis.com/js/sharethis.js#property=6164f650ea6eca00151d8d08&amp;product=inline-share-buttons" defer></script></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">喜欢这篇文章？打赏一下作者吧</h3><div class="buttons is-centered"><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>微信</span><span class="qrcode"><img src="/images/wechat_pay.jpg" alt="微信"></span></a><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>支付宝</span><span class="qrcode"><img src="/images/alipay.jpg" alt="支付宝"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2021-10-JVM%E7%B3%BB%E5%88%97-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/"><span class="level-item">JVM 系列 ———— JVM 基础</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">评论</h3><div id="comment-container"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css"><script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script><script>var gitalk = new Gitalk({
+            id: "525623e1e5c3bcb09690c97e3509003b",
+            repo: "caolizhi.github.io",
+            owner: "caolizhi",
+            clientID: "a494d62f203aa8c7e2e2",
+            clientSecret: "7114657b7a13cc18ec25989917c5d2de0de93f5c",
+            admin: ["caolizhi"],
+            createIssueManually: false,
+            distractionFreeMode: false,
+            perPage: 10,
+            pagerDirection: "last",
+            
+            
+            enableHotKey: true,
+            
+        })
+        gitalk.render('comment-container')</script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1 is-sticky"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/images/avatar.png" alt="操先森"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">操先森</p><p class="is-size-6 is-block">Java Engineer</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>四川·成都</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">17</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">9</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">13</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/caolizhi" target="_blank" rel="noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/caolizhi"><i class="fab fa-github"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">目录</h3><ul class="menu-list"><li><a class="level is-mobile" href="#1-预备工作"><span class="level-left"><span class="level-item">1</span><span class="level-item">1. 预备工作</span></span></a></li><li><a class="level is-mobile" href="#2-安装-kubeadm"><span class="level-left"><span class="level-item">2</span><span class="level-item">2. 安装 kubeadm</span></span></a></li><li><a class="level is-mobile" href="#3-修改-kubeadm-的默认配置"><span class="level-left"><span class="level-item">3</span><span class="level-item">3. 修改 kubeadm 的默认配置</span></span></a></li><li><a class="level is-mobile" href="#4-下载-Kubernetes-的相关镜像"><span class="level-left"><span class="level-item">4</span><span class="level-item">4. 下载 Kubernetes 的相关镜像</span></span></a></li><li><a class="level is-mobile" href="#5-运行-kubeadm-init-命令安装-Master-节点"><span class="level-left"><span class="level-item">5</span><span class="level-item">5. 运行 kubeadm init 命令安装 Master 节点</span></span></a></li><li><a class="level is-mobile" href="#6-加入新的-node-节点"><span class="level-left"><span class="level-item">6</span><span class="level-item">6. 加入新的 node 节点</span></span></a></li><li><a class="level is-mobile" href="#7-安装-CNI-网络插件"><span class="level-left"><span class="level-item">7</span><span class="level-item">7. 安装 CNI 网络插件</span></span></a></li><li><a class="level is-mobile" href="#8-验证-Kurnetes-集群是否正常工作"><span class="level-left"><span class="level-item">8</span><span class="level-item">8. 验证 Kurnetes 集群是否正常工作</span></span></a></li></ul></div></div><script src="/js/toc.js" defer></script></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Java/"><span class="level-start"><span class="level-item">Java</span></span><span class="level-end"><span class="level-item tag">5</span></span></a><ul><li><a class="level is-mobile" href="/categories/Java/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"><span class="level-start"><span class="level-item">内存模型</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/Java/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"><span class="level-start"><span class="level-item">多线程</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li></ul></li><li><a class="level is-mobile" href="/categories/Linux/"><span class="level-start"><span class="level-item">Linux</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/"><span class="level-start"><span class="level-item">云原生</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%93%8D%E5%BA%94%E5%BC%8F%E7%BC%96%E7%A8%8B/"><span class="level-start"><span class="level-item">响应式编程</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%AE%B9%E5%99%A8%E4%BA%91/"><span class="level-start"><span class="level-item">容器云</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"><span class="level-start"><span class="level-item">数据库</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/"><span class="level-start"><span class="level-item">网络编程</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-11-01T08:54:17.000Z">2021-11-01</time></p><p class="title"><a href="/2021-11-%E4%BD%BF%E7%94%A8Kubeadm%E5%B7%A5%E5%85%B7%E5%BF%AB%E9%80%9F%E5%AE%89%E8%A3%85K8S%E9%9B%86%E7%BE%A4/">使用Kubeadm工具快速安装K8S集群</a></p><p class="categories"><a href="/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/">云原生</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-10-29T08:51:43.000Z">2021-10-29</time></p><p class="title"><a href="/2021-10-JVM%E7%B3%BB%E5%88%97-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">JVM 系列 ———— JVM 基础</a></p><p class="categories"><a href="/categories/Java/">Java</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-10-26T06:48:48.000Z">2021-10-26</time></p><p class="title"><a href="/2021-10-VMwarePro16%E9%85%8D%E7%BD%AE%E5%85%B1%E4%BA%AB%E6%96%87%E4%BB%B6%E5%A4%B9/">VMware PRO 16 配置共享文件夹</a></p><p class="categories"><a href="/categories/Linux/">Linux</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-10-26T06:22:33.000Z">2021-10-26</time></p><p class="title"><a href="/2021-10-VMwarePro16%E5%A4%8D%E5%88%B6%E8%99%9A%E6%8B%9F%E6%9C%BA/">VMware PRO 16 复制虚拟机</a></p><p class="categories"><a href="/categories/Linux/">Linux</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-10-25T14:45:41.000Z">2021-10-25</time></p><p class="title"><a href="/2021-10-VMwarePro16%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA/">VMware PRO 16 安装虚拟机-自定义分区</a></p><p class="categories"><a href="/categories/Linux/">Linux</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2021/11/"><span class="level-start"><span class="level-item">十一月 2021</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/10/"><span class="level-start"><span class="level-item">十月 2021</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/09/"><span class="level-start"><span class="level-item">九月 2021</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/08/"><span class="level-start"><span class="level-item">八月 2021</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/AQS/"><span class="tag">AQS</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/CAS/"><span class="tag">CAS</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/I-O/"><span class="tag">I/O</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/JUC/"><span class="tag">JUC</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/JVM/"><span class="tag">JVM</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Java/"><span class="tag">Java</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/K8S/"><span class="tag">K8S</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/MongoDB/"><span class="tag">MongoDB</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/mysql/"><span class="tag">mysql</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/reactive/"><span class="tag">reactive</span><span class="tag">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/web/"><span class="tag">web</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/"><span class="tag">线程池</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E8%99%9A%E6%8B%9F%E6%9C%BA/"><span class="tag">虚拟机</span><span class="tag">3</span></a></div></div></div></div></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/images/logo.svg" alt="操先森的博客" height="28"></a><p class="is-size-7"><span>&copy; 2021 操先森</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/caolizhi"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>
